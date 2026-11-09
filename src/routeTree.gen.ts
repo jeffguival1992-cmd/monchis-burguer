@@ -10,11 +10,31 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ClienteRouteImport } from './routes/cliente'
 import { Route as RegistroRouteImport } from './routes/registro'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminClientesRouteImport } from './routes/admin.clientes'
+import { Route as AdminCompraRouteImport } from './routes/admin.compra'
+import { Route as AdminConfiguracionRouteImport } from './routes/admin.configuracion'
+import { Route as AdminEscanearRouteImport } from './routes/admin.escanear'
+import { Route as AdminMovimientosRouteImport } from './routes/admin.movimientos'
+import { Route as AdminNotificacionesRouteImport } from './routes/admin.notificaciones'
+import { Route as AdminRecompensasRouteImport } from './routes/admin.recompensas'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClienteRoute = ClienteRouteImport.update({
+  id: '/cliente',
+  path: '/cliente',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegistroRoute = RegistroRouteImport.update({
@@ -22,30 +42,137 @@ const RegistroRoute = RegistroRouteImport.update({
   path: '/registro',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminClientesRoute = AdminClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCompraRoute = AdminCompraRouteImport.update({
+  id: '/compra',
+  path: '/compra',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfiguracionRoute = AdminConfiguracionRouteImport.update({
+  id: '/configuracion',
+  path: '/configuracion',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEscanearRoute = AdminEscanearRouteImport.update({
+  id: '/escanear',
+  path: '/escanear',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMovimientosRoute = AdminMovimientosRouteImport.update({
+  id: '/movimientos',
+  path: '/movimientos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificacionesRoute = AdminNotificacionesRouteImport.update({
+  id: '/notificaciones',
+  path: '/notificaciones',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRecompensasRoute = AdminRecompensasRouteImport.update({
+  id: '/recompensas',
+  path: '/recompensas',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/cliente': typeof ClienteRoute
   '/registro': typeof RegistroRoute
+  '/admin/clientes': typeof AdminClientesRoute
+  '/admin/compra': typeof AdminCompraRoute
+  '/admin/configuracion': typeof AdminConfiguracionRoute
+  '/admin/escanear': typeof AdminEscanearRoute
+  '/admin/movimientos': typeof AdminMovimientosRoute
+  '/admin/notificaciones': typeof AdminNotificacionesRoute
+  '/admin/recompensas': typeof AdminRecompensasRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cliente': typeof ClienteRoute
   '/registro': typeof RegistroRoute
+  '/admin/clientes': typeof AdminClientesRoute
+  '/admin/compra': typeof AdminCompraRoute
+  '/admin/configuracion': typeof AdminConfiguracionRoute
+  '/admin/escanear': typeof AdminEscanearRoute
+  '/admin/movimientos': typeof AdminMovimientosRoute
+  '/admin/notificaciones': typeof AdminNotificacionesRoute
+  '/admin/recompensas': typeof AdminRecompensasRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/cliente': typeof ClienteRoute
   '/registro': typeof RegistroRoute
+  '/admin/clientes': typeof AdminClientesRoute
+  '/admin/compra': typeof AdminCompraRoute
+  '/admin/configuracion': typeof AdminConfiguracionRoute
+  '/admin/escanear': typeof AdminEscanearRoute
+  '/admin/movimientos': typeof AdminMovimientosRoute
+  '/admin/notificaciones': typeof AdminNotificacionesRoute
+  '/admin/recompensas': typeof AdminRecompensasRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/registro'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/cliente'
+    | '/registro'
+    | '/admin/clientes'
+    | '/admin/compra'
+    | '/admin/configuracion'
+    | '/admin/escanear'
+    | '/admin/movimientos'
+    | '/admin/notificaciones'
+    | '/admin/recompensas'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/registro'
-  id: '__root__' | '/' | '/registro'
+  to:
+    | '/'
+    | '/cliente'
+    | '/registro'
+    | '/admin/clientes'
+    | '/admin/compra'
+    | '/admin/configuracion'
+    | '/admin/escanear'
+    | '/admin/movimientos'
+    | '/admin/notificaciones'
+    | '/admin/recompensas'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/cliente'
+    | '/registro'
+    | '/admin/clientes'
+    | '/admin/compra'
+    | '/admin/configuracion'
+    | '/admin/escanear'
+    | '/admin/movimientos'
+    | '/admin/notificaciones'
+    | '/admin/recompensas'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  ClienteRoute: typeof ClienteRoute
   RegistroRoute: typeof RegistroRoute
 }
 
@@ -58,6 +185,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cliente': {
+      id: '/cliente'
+      path: '/cliente'
+      fullPath: '/cliente'
+      preLoaderRoute: typeof ClienteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/registro': {
       id: '/registro'
       path: '/registro'
@@ -65,11 +206,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegistroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/clientes': {
+      id: '/admin/clientes'
+      path: '/clientes'
+      fullPath: '/admin/clientes'
+      preLoaderRoute: typeof AdminClientesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/compra': {
+      id: '/admin/compra'
+      path: '/compra'
+      fullPath: '/admin/compra'
+      preLoaderRoute: typeof AdminCompraRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracion': {
+      id: '/admin/configuracion'
+      path: '/configuracion'
+      fullPath: '/admin/configuracion'
+      preLoaderRoute: typeof AdminConfiguracionRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/escanear': {
+      id: '/admin/escanear'
+      path: '/escanear'
+      fullPath: '/admin/escanear'
+      preLoaderRoute: typeof AdminEscanearRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/movimientos': {
+      id: '/admin/movimientos'
+      path: '/movimientos'
+      fullPath: '/admin/movimientos'
+      preLoaderRoute: typeof AdminMovimientosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notificaciones': {
+      id: '/admin/notificaciones'
+      path: '/notificaciones'
+      fullPath: '/admin/notificaciones'
+      preLoaderRoute: typeof AdminNotificacionesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/recompensas': {
+      id: '/admin/recompensas'
+      path: '/recompensas'
+      fullPath: '/admin/recompensas'
+      preLoaderRoute: typeof AdminRecompensasRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminClientesRoute: typeof AdminClientesRoute
+  AdminCompraRoute: typeof AdminCompraRoute
+  AdminConfiguracionRoute: typeof AdminConfiguracionRoute
+  AdminEscanearRoute: typeof AdminEscanearRoute
+  AdminMovimientosRoute: typeof AdminMovimientosRoute
+  AdminNotificacionesRoute: typeof AdminNotificacionesRoute
+  AdminRecompensasRoute: typeof AdminRecompensasRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminClientesRoute: AdminClientesRoute,
+  AdminCompraRoute: AdminCompraRoute,
+  AdminConfiguracionRoute: AdminConfiguracionRoute,
+  AdminEscanearRoute: AdminEscanearRoute,
+  AdminMovimientosRoute: AdminMovimientosRoute,
+  AdminNotificacionesRoute: AdminNotificacionesRoute,
+  AdminRecompensasRoute: AdminRecompensasRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  ClienteRoute: ClienteRoute,
   RegistroRoute: RegistroRoute,
 }
 export const routeTree = rootRouteImport
