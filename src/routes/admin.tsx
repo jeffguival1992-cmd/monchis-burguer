@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { Bell, Gift, LayoutDashboard, ListOrdered, Menu, ReceiptText, ScanLine, Settings, Users, X } from "lucide-react";
-import mascot from "@/assets/mascot.png";
+import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
 import { DemoSwitcher, Logo } from "@/components/monchis/Brand";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -51,7 +51,7 @@ function AdminLayout() {
         ))}
       </nav>
       <div className="flex items-center gap-3 rounded-2xl bg-sidebar-accent p-3">
-        <img src={mascot} alt="" className="h-9 w-9" />
+        <img src={mascot.url} alt="" className="h-9 w-9 rounded-full object-cover" />
         <div className="text-xs"><p className="font-bold">{me.name}</p><p className="text-muted-foreground">{me.role}</p></div>
       </div>
     </aside>
@@ -73,7 +73,7 @@ function AdminLayout() {
           <DemoSwitcher />
         </header>
         <main className="mx-auto max-w-6xl p-4 sm:p-6">
-          {hydrated ? <Outlet /> : <div className="flex justify-center py-20"><img src={mascot} alt="" className="h-20 w-20 animate-float" /></div>}
+          {hydrated ? <Outlet /> : <div className="flex justify-center py-20"><img src={mascot.url} alt="" className="h-20 w-20 rounded-full object-cover animate-float" /></div>}
         </main>
       </div>
     </div>

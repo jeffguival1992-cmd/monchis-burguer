@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import mascot from "@/assets/mascot.png";
+import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
 import { Logo } from "@/components/monchis/Brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ function Registro() {
     <div className="mx-auto min-h-screen max-w-md px-4 py-5">
       <Logo />
       <div className="relative mt-10 rounded-3xl border border-border bg-card p-6 pt-16 animate-rise">
-        <img src={mascot} alt="Dino Monchis" width={1024} height={1024} className="absolute -top-14 left-1/2 h-28 w-28 -translate-x-1/2 animate-float" />
+        <img src={mascot.url} alt="Dino Monchis" width={1024} height={1024} className="absolute -top-14 left-1/2 h-28 w-28 -translate-x-1/2 rounded-full object-cover animate-float" />
         <h1 className="text-center text-3xl">¡Únete al club!</h1>
         <p className="mt-1 text-center text-sm text-muted-foreground">Recibe <b className="text-accent">{welcome} puntos</b> de regalo al registrarte.</p>
         <form onSubmit={submit} className="mt-6 space-y-4">

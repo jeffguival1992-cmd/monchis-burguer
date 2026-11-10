@@ -7,7 +7,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/movimientos")({
-  head: () => ({ meta: [{ title: "Movimientos — Panel Monchis" }, { name: "description", content: "Historial de puntos, sellos y canjes." }, { property: "og:title", content: "Movimientos — Panel Monchis" }, { property: "og:description", content: "Historial de operaciones." }] }),
+  head: () => ({ meta: [{ title: "Movimientos — Panel Monchis" }, { name: "description", content: "Historial de puntos, sellos y canjes." }, { property: "og:title", content: "Movimientos — Panel Monchis" }, { property: "og:description", content: "Historial de operaciones." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Movimientos,
 });
 

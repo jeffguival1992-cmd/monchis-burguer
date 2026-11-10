@@ -13,7 +13,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/notificaciones")({
-  head: () => ({ meta: [{ title: "Notificaciones — Panel Monchis" }, { name: "description", content: "Envía mensajes simulados a los socios Monchis." }, { property: "og:title", content: "Notificaciones — Panel Monchis" }, { property: "og:description", content: "Mensajes para socios." }] }),
+  head: () => ({ meta: [{ title: "Notificaciones — Panel Monchis" }, { name: "description", content: "Envía mensajes simulados a los socios Monchis." }, { property: "og:title", content: "Notificaciones — Panel Monchis" }, { property: "og:description", content: "Mensajes para socios." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Notificaciones,
 });
 

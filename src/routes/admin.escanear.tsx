@@ -3,11 +3,11 @@ import { toast } from "sonner";
 import { CustomerSearch, IdentifiedCustomer, PageTitle, Panel } from "@/components/monchis/AdminParts";
 import { SimBadge } from "@/components/monchis/Brand";
 import { QrScanner } from "@/components/monchis/QrScanner";
-import mascot from "@/assets/mascot.png";
+import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
 import { findByQr, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/escanear")({
-  head: () => ({ meta: [{ title: "Escanear QR — Panel Monchis" }, { name: "description", content: "Identifica al cliente escaneando su QR Monchis." }, { property: "og:title", content: "Escanear QR — Panel Monchis" }, { property: "og:description", content: "Identifica clientes en segundos." }] }),
+  head: () => ({ meta: [{ title: "Escanear QR — Panel Monchis" }, { name: "description", content: "Identifica al cliente escaneando su QR Monchis." }, { property: "og:title", content: "Escanear QR — Panel Monchis" }, { property: "og:description", content: "Identifica clientes en segundos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Escanear,
 });
 
@@ -34,7 +34,7 @@ function Escanear() {
         <Panel title="Cliente">
           {selected ? <IdentifiedCustomer customerId={selected} onClear={() => select(null)} /> : (
             <div className="flex flex-col items-center py-12 text-center">
-              <img src={mascot} alt="" className="h-28 w-28 animate-float" />
+              <img src={mascot.url} alt="" className="h-28 w-28 rounded-full object-cover animate-float" />
               <p className="mt-3 font-semibold">Esperando cliente…</p>
               <p className="text-sm text-muted-foreground">Escanea su QR o búscalo por nombre, correo, teléfono o código.</p>
             </div>

@@ -3,7 +3,7 @@ import { CustomerSearch, IdentifiedCustomer, PageTitle, Panel } from "@/componen
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/compra")({
-  head: () => ({ meta: [{ title: "Registrar compra — Panel Monchis" }, { name: "description", content: "Registra compras y entrega puntos a socios Monchis." }, { property: "og:title", content: "Registrar compra — Panel Monchis" }, { property: "og:description", content: "Entrega puntos al instante." }] }),
+  head: () => ({ meta: [{ title: "Registrar compra — Panel Monchis" }, { name: "description", content: "Registra compras y entrega puntos a socios Monchis." }, { property: "og:title", content: "Registrar compra — Panel Monchis" }, { property: "og:description", content: "Entrega puntos al instante." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Compra,
 });
 

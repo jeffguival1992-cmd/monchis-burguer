@@ -8,7 +8,7 @@ import { tierOf, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/clientes")({
-  head: () => ({ meta: [{ title: "Clientes — Panel Monchis" }, { name: "description", content: "Socios del Monchis Loyalty Club." }, { property: "og:title", content: "Clientes — Panel Monchis" }, { property: "og:description", content: "Gestiona los socios del club." }] }),
+  head: () => ({ meta: [{ title: "Clientes — Panel Monchis" }, { name: "description", content: "Socios del Monchis Loyalty Club." }, { property: "og:title", content: "Clientes — Panel Monchis" }, { property: "og:description", content: "Gestiona los socios del club." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Clientes,
 });
 

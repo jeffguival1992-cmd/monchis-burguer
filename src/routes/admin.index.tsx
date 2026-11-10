@@ -7,7 +7,7 @@ import { fmtDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/")({
-  head: () => ({ meta: [{ title: "Dashboard — Panel Monchis" }, { name: "description", content: "Indicadores del programa de fidelización Monchis." }, { property: "og:title", content: "Dashboard — Panel Monchis" }, { property: "og:description", content: "Indicadores del club." }] }),
+  head: () => ({ meta: [{ title: "Dashboard — Panel Monchis" }, { name: "description", content: "Indicadores del programa de fidelización Monchis." }, { property: "og:title", content: "Dashboard — Panel Monchis" }, { property: "og:description", content: "Indicadores del club." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Dashboard,
 });
 

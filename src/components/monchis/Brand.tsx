@@ -1,18 +1,14 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import mascot from "@/assets/mascot.png";
+import logo from "@/assets/monchis-logo.jpeg.asset.json";
 import { useStore, type Role } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export function Logo({ className, small }: { className?: string; small?: boolean }) {
   return (
-    <Link to="/" className={cn("flex items-center gap-2", className)}>
-      <img src={mascot} alt="Mascota Monchis" width={1024} height={1024} className={small ? "h-9 w-9" : "h-11 w-11"} />
-      <span className="leading-none">
-        <span className={cn("font-display block text-foreground", small ? "text-lg" : "text-xl")}>MONCHIS</span>
-        <span className="block text-[10px] font-bold tracking-[0.25em] text-primary">BURGUERS</span>
-      </span>
+    <Link to="/" aria-label="Monchis Burguers — Inicio" className={cn("flex shrink-0 items-center", className)}>
+      <img src={logo.url} alt="Monchis Burguers" width={1143} height={762} className={small ? "h-14 w-[84px] object-contain" : "h-20 w-[120px] object-contain"} />
     </Link>
   );
 }

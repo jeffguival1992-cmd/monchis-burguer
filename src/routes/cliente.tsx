@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell, CreditCard, Gift, History } from "lucide-react";
 import { toast } from "sonner";
-import mascot from "@/assets/mascot.png";
+import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
 import { DemoSwitcher, Logo } from "@/components/monchis/Brand";
 import { LoyaltyCard } from "@/components/monchis/LoyaltyCard";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,7 @@ function Cliente() {
   const notifications = useStore((s) => s.notifications);
   const unread = notifications.filter((n) => n.customerId === customer.id && !n.read).length;
 
-  if (!hydrated) return <div className="flex min-h-screen items-center justify-center"><img src={mascot} alt="" className="h-24 w-24 animate-float" /></div>;
+  if (!hydrated) return <div className="flex min-h-screen items-center justify-center"><img src={mascot.url} alt="" className="h-24 w-24 rounded-full object-cover animate-float" /></div>;
 
   return (
     <div className="mx-auto min-h-screen max-w-md px-4 pb-28 pt-4">
