@@ -37,7 +37,7 @@ function AdminLayout() {
   const employees = useStore((s) => s.employees);
   const [open, setOpen] = useState(false);
   const items = nav.filter((n) => role === "admin" || !("admin" in n));
-  const me = role === "admin" ? employees[0] : employees[1];
+  const me = role === "admin" ? employees[0]! : employees[1]!;
 
   const sidebar = (
     <aside className="flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar p-4">

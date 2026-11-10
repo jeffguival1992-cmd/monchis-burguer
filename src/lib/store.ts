@@ -60,7 +60,7 @@ export const useStore = create<State>()(
         const customer: Customer = {
           id: uid("c"), code: `MON-${String(1000 + n)}`, name: d.name.trim(), email, phone: d.phone.trim(),
           birthdate: d.birthdate, points: bonus, totalEarned: bonus, totalUsed: 0, stamps: 0, visits: 0,
-          joinedAt: now(), branchId: s.branches[0].id,
+          joinedAt: now(), branchId: s.branches[0]?.id ?? "b1",
         };
         const mv: Movement = { id: uid("m"), customerId: customer.id, type: "bonus", points: bonus, description: "Bono de bienvenida", date: now() };
         const nt: Notification = { id: uid("n"), customerId: customer.id, type: "reward", title: "¡Bienvenido al club!", message: `¡Hola ${customer.name.split(" ")[0]}! Te regalamos ${bonus} puntos de bienvenida.`, date: now(), read: false };
@@ -82,7 +82,7 @@ export const useStore = create<State>()(
         if (s.purchases.some((p) => p.orderNumber.toLowerCase() === orderNumber.trim().toLowerCase())) return { ok: false, error: "Ese número de pedido ya fue registrado." };
         const stampsMode = s.settings.mode === "stamps";
         const pts = stampsMode ? 0 : Math.floor(amount * s.settings.pointsPerUsd);
-        const p: Purchase = { id: uid("p"), customerId, amount, orderNumber: orderNumber.trim(), branchId, points: pts, date: now(), employeeId: s.employees[s.role === "admin" ? 0 : 1].id };
+        const p: Purchase = { id: uid("p"), customerId, amount, orderNumber: orderNumber.trim(), branchId, points: pts, date: now(), employeeId: s.employees[s.role === "admin" ? 0 : 1]?.id ?? "e1" };
         let stamps = c.stamps;
         const movements: Movement[] = [];
         const notifications: Notification[] = [];
@@ -133,7 +133,7 @@ export const useStore = create<State>()(
         const s = get();
         const list = customerIds.map((id) => {
           const c = s.customers.find((x) => x.id === id)!;
-          return { id: uid("n"), customerId: id, type, title, message: message.replace(/\{nombre\}/gi, c.name.split(" ")[0]), date: now(), read: false } as Notification;
+          return { id: uid("n"), customerId: id, type, title, message: message.replace(/\{nombre\}/gi, c.name.split(" ")[0] ?? ""), date: now(), read: false } as Notification;
         });
         set({ notifications: [...list, ...s.notifications] });
         return list.length;

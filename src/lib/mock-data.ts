@@ -38,7 +38,7 @@ export function buildSeed(): Seed {
     { id: "e3", name: "Luis Mendoza", role: "Cajero", branchId: "b2" },
   ];
   const customers: Customer[] = people.map(([name, points, earned, stamps], i) => {
-    const [f, l] = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ");
+    const [f, l] = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ") as [string, string];
     return {
       id: `c${i + 1}`, code: `MON-${1001 + i}`, name, email: `${f}.${l}@mail.com`, phone: `09${String(81234560 + i * 1371).slice(0, 8)}`,
       birthdate: `199${i % 10}-${String((i % 12) + 1).padStart(2, "0")}-${String((i % 27) + 1).padStart(2, "0")}`,
@@ -59,7 +59,7 @@ export function buildSeed(): Seed {
   const amounts = [15, 22.5, 9.75, 31, 12, 18.4, 27, 8.5, 44, 16];
   const buyers = [0, 1, 2, 4, 5, 8, 4, 3, 13, 11];
   const purchases: Purchase[] = amounts.map((a, i) => ({
-    id: `p${i + 1}`, customerId: `c${buyers[i] + 1}`, amount: a, orderNumber: `ORD-${5200 + i}`, branchId: i % 2 ? "b2" : "b1",
+    id: `p${i + 1}`, customerId: `c${(buyers[i] ?? 0) + 1}`, amount: a, orderNumber: `ORD-${5200 + i}`, branchId: i % 2 ? "b2" : "b1",
     points: Math.floor(a), date: daysAgo(Math.floor(i / 2), i * 2), employeeId: i % 2 ? "e3" : "e2",
   }));
   const redemptionDefs: [number, string, number][] = [[4, "r4", 3], [2, "r1", 5], [8, "r5", 7], [13, "r2", 9], [0, "r3", 11]];

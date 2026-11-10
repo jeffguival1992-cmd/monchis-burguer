@@ -32,7 +32,7 @@ function Cliente() {
   const currentId = useStore((s) => s.currentCustomerId);
   const setCurrent = useStore((s) => s.setCurrentCustomer);
   const [tab, setTab] = useState<Tab>("card");
-  const customer = customers.find((c) => c.id === (currentId ?? "c1")) ?? customers[0];
+  const customer = customers.find((c) => c.id === (currentId ?? "c1")) ?? customers[0]!;
   const notifications = useStore((s) => s.notifications);
   const unread = notifications.filter((n) => n.customerId === customer.id && !n.read).length;
 
