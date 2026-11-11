@@ -15,7 +15,8 @@ type State = Seed & {
   setCurrentCustomer: (id: string | null) => void;
   selectCustomer: (id: string | null) => void;
   clearCelebration: () => void;
-  register: (d: { name: string; email: string; phone: string; birthdate: string }) => { ok: true; customer: Customer } | { ok: false; error: string };
+  register: (d: { cedula: string; phone: string }) => { ok: true; customer: Customer } | { ok: false; error: string };
+  updateProfile: (id: string, d: { name: string; email: string; birthdate: string }) => { ok: true } | { ok: false; error: string };
   registerPurchase: (d: { customerId: string; amount: number; orderNumber: string; branchId: string }) => { ok: true; points: number } | { ok: false; error: string };
   redeem: (customerId: string, rewardId: string) => { ok: true } | { ok: false; error: string };
   sendNotification: (d: { customerIds: string[]; type: Notification["type"]; title: string; message: string }) => number;
@@ -50,26 +51,35 @@ export const useStore = create<State>()(
 
       register: (d) => {
         const s = get();
-        const email = d.email.trim().toLowerCase();
-        if (!d.name.trim() || !email || !d.phone.trim() || !d.birthdate) return { ok: false, error: "Completa todos los campos." };
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Correo electrónico no válido." };
-        if (!/^\+?[0-9\s]{7,15}$/.test(d.phone.trim())) return { ok: false, error: "Número de celular no válido." };
-        if (s.customers.some((c) => c.email === email)) return { ok: false, error: "Ya existe un socio con ese correo." };
+        const cedula = d.cedula.replace(/\D/g, "");
+        const phone = d.phone.replace(/\s/g, "");
+        if (!/^\d{10}$/.test(cedula)) return { ok: false, error: "La cédula debe tener 10 dígitos." };
+        if (!/^09\d{8}$/.test(phone)) return { ok: false, error: "Ingresa un celular válido (09xxxxxxxx)." };
+        if (s.customers.some((c) => c.cedula === cedula)) return { ok: false, error: "Ya existe un socio con esa cédula." };
         const n = s.customers.length + 1;
         const bonus = s.settings.welcomePoints;
         const customer: Customer = {
-          id: uid("c"), code: `MON-${String(1000 + n)}`, name: d.name.trim(), email, phone: d.phone.trim(),
-          birthdate: d.birthdate, points: bonus, totalEarned: bonus, totalUsed: 0, stamps: 0, visits: 0,
+          id: uid("c"), code: `MON-${String(1000 + n)}`, cedula, name: "", email: "", phone,
+          birthdate: "", points: bonus, totalEarned: bonus, totalUsed: 0, stamps: 0, visits: 0,
           joinedAt: now(), branchId: s.branches[0]?.id ?? "b1",
         };
         const mv: Movement = { id: uid("m"), customerId: customer.id, type: "bonus", points: bonus, description: "Bono de bienvenida", date: now() };
-        const nt: Notification = { id: uid("n"), customerId: customer.id, type: "reward", title: "¡Bienvenido al club!", message: `¡Hola ${customer.name.split(" ")[0]}! Te regalamos ${bonus} puntos de bienvenida.`, date: now(), read: false };
+        const nt: Notification = { id: uid("n"), customerId: customer.id, type: "reward", title: "¡Bienvenido al club!", message: `¡Hola! Te regalamos ${bonus} puntos de bienvenida.`, date: now(), read: false };
         set({
           customers: [customer, ...s.customers], movements: [mv, ...s.movements], notifications: [nt, ...s.notifications],
           currentCustomerId: customer.id,
           celebration: { kind: "welcome", title: "¡BIENVENIDO A MONCHIS!", message: `Tu tarjeta está lista. Ganaste ${bonus} puntos de bienvenida.` },
         });
         return { ok: true, customer };
+      },
+
+      updateProfile: (id, d) => {
+        const email = d.email.trim().toLowerCase();
+        if (!d.name.trim()) return { ok: false, error: "Ingresa tu nombre." };
+        if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Correo electrónico no válido." };
+        if (email && get().customers.some((c) => c.id !== id && c.email === email)) return { ok: false, error: "Ese correo ya está registrado." };
+        set((s) => ({ customers: s.customers.map((c) => (c.id === id ? { ...c, name: d.name.trim(), email, birthdate: d.birthdate } : c)) }));
+        return { ok: true };
       },
 
       registerPurchase: ({ customerId, amount, orderNumber, branchId }) => {
@@ -133,7 +143,7 @@ export const useStore = create<State>()(
         const s = get();
         const list = customerIds.map((id) => {
           const c = s.customers.find((x) => x.id === id)!;
-          return { id: uid("n"), customerId: id, type, title, message: message.replace(/\{nombre\}/gi, c.name.split(" ")[0] ?? ""), date: now(), read: false } as Notification;
+          return { id: uid("n"), customerId: id, type, title, message: message.replace(/\{nombre\}/gi, c.name.split(" ")[0] || "socio"), date: now(), read: false } as Notification;
         });
         set({ notifications: [...list, ...s.notifications] });
         return list.length;
@@ -145,7 +155,7 @@ export const useStore = create<State>()(
       reset: () => set({ ...buildSeed(), currentCustomerId: null, selectedCustomerId: null, celebration: null }),
     }),
     {
-      name: "monchis-loyalty-v1",
+      name: "monchis-loyalty-v2",
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
       partialize: ({ celebration, hydrated, ...rest }) => rest,

@@ -1,3 +1,4 @@
+import { displayName } from "@/lib/format";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,7 @@ export function CustomerSearch({ onPick, limit = 6 }: { onPick: (c: Customer) =>
     <div>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Nombre, correo, teléfono o código (MON-1001)" className="h-12 pl-9" />
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cédula, nombre, teléfono o código (MON-1001)" className="h-12 pl-9" />
       </div>
       {q.trim() && (
         <ul className="mt-2 divide-y divide-border rounded-2xl border border-border">
@@ -41,8 +42,8 @@ export function CustomerSearch({ onPick, limit = 6 }: { onPick: (c: Customer) =>
           {res.map((c) => (
             <li key={c.id}>
               <button onClick={() => { onPick(c); setQ(""); }} className="flex w-full items-center gap-3 p-3 text-left hover:bg-muted">
-                <Avatar name={c.name} />
-                <span className="min-w-0 flex-1"><b className="block truncate">{c.name}</b><span className="text-xs text-muted-foreground">{c.code} · {c.phone}</span></span>
+                <Avatar name={displayName(c)} />
+                <span className="min-w-0 flex-1"><b className="block truncate">{displayName(c)}</b><span className="text-xs text-muted-foreground">{c.code} · CI {c.cedula}</span></span>
                 <span className="font-display text-primary">{c.points} pts</span>
               </button>
             </li>
@@ -66,7 +67,7 @@ export function IdentifiedCustomer({ customerId, onClear }: { customerId: string
           <div key={l as string} className="rounded-2xl bg-muted p-2"><p className="font-display text-xl">{v}</p><p className="text-[11px] text-muted-foreground">{l}</p></div>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground">{c.email} · {c.phone}</p>
+      <p className="text-xs text-muted-foreground">{c.cedula} · {c.phone}</p>
       <Button variant="hero" size="xl" className="w-full" onClick={() => setOpen(true)}>REGISTRAR COMPRA</Button>
       {onClear && <Button variant="ghost" className="w-full" onClick={onClear}>Atender a otro cliente</Button>}
       <PurchaseDialog customer={c} open={open} onOpenChange={setOpen} />

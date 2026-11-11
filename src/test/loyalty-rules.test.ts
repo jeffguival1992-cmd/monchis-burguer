@@ -28,4 +28,16 @@ describe("loyalty rules", () => {
     expect(maria().points).toBe(before - 150);
     expect(useStore.getState().redeem("c1", "r5").ok).toBe(false);
   });
+
+  it("quick sign-up needs only a 10-digit cédula and phone, then profile can be completed", () => {
+    const st = useStore.getState();
+    expect(st.register({ cedula: "123", phone: "0991234567" }).ok).toBe(false);
+    const r = st.register({ cedula: "0955555555", phone: "0991234567" });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.customer.name).toBe("");
+    expect(useStore.getState().register({ cedula: "0955555555", phone: "0990000000" }).ok).toBe(false);
+    expect(useStore.getState().updateProfile(r.customer.id, { name: "Laura Méndez", email: "laura@mail.com", birthdate: "1998-04-12" }).ok).toBe(true);
+    expect(useStore.getState().customers.find((c) => c.id === r.customer.id)?.name).toBe("Laura Méndez");
+  });
 });

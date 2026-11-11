@@ -1,3 +1,4 @@
+import { displayName } from "@/lib/format";
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Avatar, PageTitle, Panel } from "@/components/monchis/AdminParts";
@@ -45,7 +46,7 @@ function Clientes() {
             <tbody className="divide-y divide-border">
               {list.map((c) => (
                 <tr key={c.id}>
-                  <td className="py-2.5"><div className="flex items-center gap-3"><Avatar name={c.name} /><div><b>{c.name}</b><p className="text-xs text-muted-foreground">{c.email}</p></div></div></td>
+                  <td className="py-2.5"><div className="flex items-center gap-3"><Avatar name={displayName(c)} /><div><b>{displayName(c)}</b><p className="text-xs text-muted-foreground">{c.email}</p></div></div></td>
                   <td className="font-mono">{c.code}</td>
                   <td>{tierOf(c.totalEarned).name}</td>
                   <td className="font-display text-lg text-primary">{c.points}</td>

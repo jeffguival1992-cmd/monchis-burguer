@@ -1,3 +1,4 @@
+import { displayName } from "@/lib/format";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Gift, ReceiptText, Star, UserPlus, Users } from "lucide-react";
@@ -60,8 +61,8 @@ function Dashboard() {
           <ul className="space-y-3">
             {top.map((c, i) => (
               <li key={c.id} className="flex items-center gap-3">
-                <span className="font-display w-4 text-accent">{i + 1}</span><Avatar name={c.name} />
-                <span className="min-w-0 flex-1"><b className="block truncate text-sm">{c.name}</b><span className="text-xs text-muted-foreground">{c.visits} visitas</span></span>
+                <span className="font-display w-4 text-accent">{i + 1}</span><Avatar name={displayName(c)} />
+                <span className="min-w-0 flex-1"><b className="block truncate text-sm">{displayName(c)}</b><span className="text-xs text-muted-foreground">{c.visits} visitas</span></span>
                 <span className="font-display text-primary">{c.points}</span>
               </li>
             ))}

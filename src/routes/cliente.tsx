@@ -1,10 +1,12 @@
+import { displayName } from "@/lib/format";
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bell, CreditCard, Gift, History } from "lucide-react";
+import { Bell, CreditCard, Gift, History, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
 import { DemoSwitcher, Logo } from "@/components/monchis/Brand";
 import { LoyaltyCard } from "@/components/monchis/LoyaltyCard";
+import { ProfileForm, profileComplete } from "@/components/monchis/ProfileForm";
 import { Button } from "@/components/ui/button";
 import { fmtDate } from "@/lib/format";
 import { useStore } from "@/lib/store";
@@ -24,7 +26,7 @@ export const Route = createFileRoute("/cliente")({
   component: Cliente,
 });
 
-type Tab = "card" | "points" | "rewards" | "inbox";
+type Tab = "card" | "points" | "rewards" | "inbox" | "profile";
 
 function Cliente() {
   const hydrated = useStore((s) => s.hydrated);
@@ -47,24 +49,31 @@ function Cliente() {
       <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
         <span>Viendo como:</span>
         <select value={customer.id} onChange={(e) => setCurrent(e.target.value)} className="flex-1 rounded-lg border border-input bg-card px-2 py-1.5 text-foreground">
-          {customers.map((c) => <option key={c.id} value={c.id}>{c.name} · {c.code}</option>)}
+          {customers.map((c) => <option key={c.id} value={c.id}>{displayName(c)} · {c.code}</option>)}
         </select>
       </div>
-      <h1 className="mt-5 text-3xl">¡Hola, {customer.name.split(" ")[0]}! 👋</h1>
+      <h1 className="mt-5 text-3xl">¡Hola, {customer.name.split(" ")[0] || "socio"}! 👋</h1>
 
+      {!profileComplete(customer) && tab !== "profile" && (
+        <button onClick={() => setTab("profile")} className="mt-4 w-full rounded-3xl border border-accent bg-accent/10 p-4 text-left">
+          <p className="font-display text-lg text-accent">Completa tu perfil</p>
+          <p className="text-sm text-muted-foreground">Agrega tu nombre, correo y cumpleaños para recibir regalos especiales.</p>
+        </button>
+      )}
       <div className="mt-4 animate-rise" key={tab}>
         {tab === "card" && <CardTab customerId={customer.id} />}
         {tab === "points" && <PointsTab customerId={customer.id} />}
         {tab === "rewards" && <RewardsTab customerId={customer.id} />}
         {tab === "inbox" && <InboxTab customerId={customer.id} />}
+        {tab === "profile" && <div className="rounded-3xl border border-border bg-card p-5"><p className="font-display mb-3 text-xl">Mi perfil</p><ProfileForm key={customer.id} customer={customer} onDone={() => setTab("card")} /></div>}
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur">
-        <div className="mx-auto grid max-w-md grid-cols-4">
-          {([["card", "Tarjeta", CreditCard], ["points", "Puntos", History], ["rewards", "Premios", Gift], ["inbox", "Bandeja", Bell]] as const).map(([id, label, Icon]) => (
+        <div className="mx-auto grid max-w-md grid-cols-5">
+          {([["card", "Tarjeta", CreditCard], ["points", "Puntos", History], ["rewards", "Premios", Gift], ["inbox", "Bandeja", Bell], ["profile", "Perfil", UserRound]] as const).map(([id, label, Icon]) => (
             <button key={id} onClick={() => setTab(id)} className={cn("relative flex flex-col items-center gap-1 py-3 text-xs font-semibold", tab === id ? "text-primary" : "text-muted-foreground")}>
               <Icon className="h-5 w-5" />{label}
-              {id === "inbox" && unread > 0 && <span className="absolute right-6 top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground">{unread}</span>}
+              {id === "inbox" && unread > 0 && <span className="absolute right-3 top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] text-primary-foreground">{unread}</span>}
             </button>
           ))}
         </div>

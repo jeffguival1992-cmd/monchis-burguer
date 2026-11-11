@@ -1,3 +1,4 @@
+import { displayName } from "@/lib/format";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ export function PurchaseDialog({ customer, open, onOpenChange }: { customer: Cus
     if (!customer) return;
     const r = registerPurchase({ customerId: customer.id, amount: parseFloat(amount), orderNumber: order, branchId: branch });
     if (!r.ok) { setError(r.error); return; }
-    toast.success(settings.mode === "stamps" ? `Sello entregado a ${customer.name}` : `${r.points} puntos entregados a ${customer.name}`);
+    toast.success(settings.mode === "stamps" ? `Sello entregado a ${displayName(customer)}` : `${r.points} puntos entregados a ${displayName(customer)}`);
     onOpenChange(false);
   };
 

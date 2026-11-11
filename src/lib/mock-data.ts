@@ -1,5 +1,5 @@
 export type Customer = {
-  id: string; code: string; name: string; email: string; phone: string; birthdate: string;
+  id: string; code: string; cedula: string; name: string; email: string; phone: string; birthdate: string;
   points: number; totalEarned: number; totalUsed: number; stamps: number; visits: number; joinedAt: string; branchId: string;
 };
 export type Employee = { id: string; name: string; role: "Administrador" | "Cajero"; branchId: string };
@@ -40,7 +40,7 @@ export function buildSeed(): Seed {
   const customers: Customer[] = people.map(([name, points, earned, stamps], i) => {
     const [f, l] = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ") as [string, string];
     return {
-      id: `c${i + 1}`, code: `MON-${1001 + i}`, name, email: `${f}.${l}@mail.com`, phone: `09${String(81234560 + i * 1371).slice(0, 8)}`,
+      id: `c${i + 1}`, code: `MON-${1001 + i}`, cedula: `09${String(12345670 + i * 7919).padStart(8, "0")}`, name, email: `${f}.${l}@mail.com`, phone: `09${String(81234560 + i * 1371).slice(0, 8)}`,
       birthdate: `199${i % 10}-${String((i % 12) + 1).padStart(2, "0")}-${String((i % 27) + 1).padStart(2, "0")}`,
       points, totalEarned: earned, totalUsed: earned - points, stamps, visits: Math.max(1, Math.round(earned / 18)),
       joinedAt: daysAgo(i < 4 ? i + 1 : 20 + i * 6), branchId: i % 2 ? "b2" : "b1",

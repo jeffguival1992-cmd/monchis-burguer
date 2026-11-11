@@ -1,3 +1,4 @@
+import { displayName } from "@/lib/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CustomerSearch, IdentifiedCustomer, PageTitle, Panel } from "@/components/monchis/AdminParts";
@@ -18,7 +19,7 @@ function Escanear() {
     const c = findByQr(useStore.getState().customers, text);
     if (!c) { toast.error("QR no reconocido. Usa un QR generado por Monchis."); return; }
     select(c.id);
-    toast.success(`Cliente identificado: ${c.name}`);
+    toast.success(`Cliente identificado: ${displayName(c)}`);
   };
   return (
     <>

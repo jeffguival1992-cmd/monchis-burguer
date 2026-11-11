@@ -1,3 +1,4 @@
+import { displayName } from "@/lib/format";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -63,7 +64,7 @@ function Notificaciones() {
               </div>
               {audience === "one" && (
                 <select value={one} onChange={(e) => setOne(e.target.value)} className="mt-2 h-9 w-full rounded-md border border-input bg-background px-2 text-sm">
-                  {customers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {customers.map((c) => <option key={c.id} value={c.id}>{displayName(c)}</option>)}
                 </select>
               )}
             </div>

@@ -1,3 +1,4 @@
+import { displayName } from "@/lib/format";
 import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download, Expand } from "lucide-react";
@@ -47,7 +48,7 @@ export function LoyaltyCard({ customer, compact }: { customer: Customer; compact
             <Expand className="absolute -right-2 -top-2 h-6 w-6 rounded-full bg-background p-1 text-primary" />
           </button>
           <div className="min-w-0 pb-1">
-            <p className="truncate text-lg font-extrabold">{customer.name}</p>
+            <p className="truncate text-lg font-extrabold">{displayName(customer)}</p>
             <p className="font-mono text-sm font-bold opacity-80">{customer.code}</p>
           </div>
         </div>
