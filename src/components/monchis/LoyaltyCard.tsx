@@ -2,7 +2,7 @@ import { displayName } from "@/lib/format";
 import { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Download, Expand } from "lucide-react";
-import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
+import mascot from "@/assets/monchis-dino.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -34,7 +34,7 @@ export function LoyaltyCard({ customer, compact }: { customer: Customer; compact
   return (
     <>
       <div className={cn("relative overflow-hidden rounded-3xl bg-loyalty-card p-5 text-primary-foreground shadow-glow", compact ? "" : "sm:p-6")}>
-        <img src={mascot.url} alt="" width={1024} height={1024} className="pointer-events-none absolute bottom-4 right-4 h-24 w-24 rounded-full object-cover opacity-95" />
+        <img src={mascot.url} alt="" width={1024} height={1024} className="pointer-events-none absolute bottom-4 right-4 h-24 w-24 object-contain drop-shadow-lg opacity-95" />
         <div className="relative flex items-start justify-between">
           <div>
             <p className="font-display text-2xl leading-none">MONCHIS</p>

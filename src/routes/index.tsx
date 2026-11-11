@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
 import { ArrowRight, ScanLine, LayoutDashboard, Smartphone } from "lucide-react";
 import burger from "@/assets/burger-hero.jpg";
-import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
+import mascot from "@/assets/monchis-dino.png.asset.json";
 import { DemoSwitcher, Logo, SimBadge } from "@/components/monchis/Brand";
 import { Button } from "@/components/ui/button";
 import { useStore, type Role } from "@/lib/store";
@@ -68,7 +68,7 @@ function Portal() {
       <section className="mx-auto max-w-6xl px-4 py-14">
         <div className="flex items-end justify-between gap-4">
           <h2 className="text-3xl sm:text-4xl">Prueba la plataforma</h2>
-          <img src={mascot.url} alt="" width={1024} height={1024} loading="lazy" className="h-20 w-20 rounded-full object-cover animate-float" />
+          <img src={mascot.url} alt="" width={1024} height={1024} loading="lazy" className="h-20 w-20 object-contain drop-shadow-lg animate-float" />
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {demos.map((d, i) => (

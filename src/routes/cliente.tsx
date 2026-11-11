@@ -3,8 +3,8 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell, CreditCard, Gift, History, UserRound } from "lucide-react";
 import { toast } from "sonner";
-import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
-import { DemoSwitcher, Logo } from "@/components/monchis/Brand";
+import mascot from "@/assets/monchis-dino.png.asset.json";
+import { Logo } from "@/components/monchis/Brand";
 import { LoyaltyCard } from "@/components/monchis/LoyaltyCard";
 import { ProfileForm, profileComplete } from "@/components/monchis/ProfileForm";
 import { Button } from "@/components/ui/button";
@@ -32,26 +32,18 @@ function Cliente() {
   const hydrated = useStore((s) => s.hydrated);
   const customers = useStore((s) => s.customers);
   const currentId = useStore((s) => s.currentCustomerId);
-  const setCurrent = useStore((s) => s.setCurrentCustomer);
   const [tab, setTab] = useState<Tab>("card");
   const customer = customers.find((c) => c.id === (currentId ?? "c1")) ?? customers[0]!;
   const notifications = useStore((s) => s.notifications);
   const unread = notifications.filter((n) => n.customerId === customer.id && !n.read).length;
 
-  if (!hydrated) return <div className="flex min-h-screen items-center justify-center"><img src={mascot.url} alt="" className="h-24 w-24 rounded-full object-cover animate-float" /></div>;
+  if (!hydrated) return <div className="flex min-h-screen items-center justify-center"><img src={mascot.url} alt="" className="h-24 w-24 object-contain drop-shadow-lg animate-float" /></div>;
 
   return (
     <div className="mx-auto min-h-screen max-w-md px-4 pb-28 pt-4">
       <header className="flex items-center justify-between gap-2">
         <Logo small />
-        <DemoSwitcher />
       </header>
-      <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-        <span>Viendo como:</span>
-        <select value={customer.id} onChange={(e) => setCurrent(e.target.value)} className="flex-1 rounded-lg border border-input bg-card px-2 py-1.5 text-foreground">
-          {customers.map((c) => <option key={c.id} value={c.id}>{displayName(c)} · {c.code}</option>)}
-        </select>
-      </div>
       <h1 className="mt-5 text-3xl">¡Hola, {customer.name.split(" ")[0] || "socio"}! 👋</h1>
 
       {!profileComplete(customer) && tab !== "profile" && (

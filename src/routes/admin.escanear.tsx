@@ -2,9 +2,8 @@ import { displayName } from "@/lib/format";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CustomerSearch, IdentifiedCustomer, PageTitle, Panel } from "@/components/monchis/AdminParts";
-import { SimBadge } from "@/components/monchis/Brand";
 import { QrScanner } from "@/components/monchis/QrScanner";
-import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
+import mascot from "@/assets/monchis-dino.png.asset.json";
 import { findByQr, useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/escanear")({
@@ -23,7 +22,7 @@ function Escanear() {
   };
   return (
     <>
-      <PageTitle title="Escanear QR" sub="Identifica al cliente, registra la compra y entrega puntos."><SimBadge real /></PageTitle>
+      <PageTitle title="Escanear QR" sub="Identifica al cliente, registra la compra y entrega puntos."></PageTitle>
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel>
           <QrScanner onResult={onScan} />
@@ -35,7 +34,7 @@ function Escanear() {
         <Panel title="Cliente">
           {selected ? <IdentifiedCustomer customerId={selected} onClear={() => select(null)} /> : (
             <div className="flex flex-col items-center py-12 text-center">
-              <img src={mascot.url} alt="" className="h-28 w-28 rounded-full object-cover animate-float" />
+              <img src={mascot.url} alt="" className="h-28 w-28 object-contain drop-shadow-lg animate-float" />
               <p className="mt-3 font-semibold">Esperando cliente…</p>
               <p className="text-sm text-muted-foreground">Escanea su QR o búscalo por nombre, correo, teléfono o código.</p>
             </div>

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
+import mascot from "@/assets/monchis-dino.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 
@@ -22,7 +22,7 @@ export function CelebrationOverlay() {
         </span>
       ))}
       <div className="relative w-full max-w-sm animate-pop rounded-3xl border border-border bg-card p-8 text-center shadow-glow" onClick={(e) => e.stopPropagation()}>
-        <img src={mascot.url} alt="" width={1024} height={1024} className="mx-auto -mt-24 h-36 w-36 rounded-full object-cover animate-float" />
+        <img src={mascot.url} alt="" width={1024} height={1024} className="mx-auto -mt-24 h-36 w-36 object-contain drop-shadow-lg animate-float" />
         <h2 className="mt-2 text-4xl text-accent">{c.title}</h2>
         <p className="font-display mt-2 text-xl text-foreground">{c.message}</p>
         <Button variant="hero" size="xl" className="mt-6 w-full" onClick={clear}>¡Monchis!</Button>

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { PageTitle, Panel } from "@/components/monchis/AdminParts";
-import { SimBadge } from "@/components/monchis/Brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,7 +43,7 @@ function Notificaciones() {
 
   return (
     <>
-      <PageTitle title="Notificaciones" sub="Los mensajes llegan a la bandeja interna del cliente. No se envía nada real."><SimBadge /></PageTitle>
+      <PageTitle title="Notificaciones" sub="Los mensajes llegan a la bandeja interna del cliente."></PageTitle>
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel title="Nuevo mensaje">
           <div className="grid grid-cols-2 gap-2">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import mascot from "@/assets/monchis-dinosaurio.jpeg.asset.json";
+import mascot from "@/assets/monchis-dino.png.asset.json";
 import { Logo } from "@/components/monchis/Brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +41,7 @@ function Registro() {
     <div className="mx-auto min-h-screen max-w-md px-4 py-5">
       <Logo />
       <div className="relative mt-14 rounded-3xl border border-border bg-card p-6 pt-16 animate-rise">
-        <img src={mascot.url} alt="Dino Monchis" width={1254} height={1254} className="absolute -top-14 left-1/2 h-28 w-28 -translate-x-1/2 rounded-full object-cover animate-float" />
+        <img src={mascot.url} alt="Dino Monchis" width={1254} height={1254} className="absolute -top-14 left-1/2 h-28 w-28 -translate-x-1/2 object-contain drop-shadow-lg animate-float" />
         <h1 className="text-center text-3xl">¡Únete al club!</h1>
         <p className="mt-1 text-center text-sm text-muted-foreground">Solo 2 datos y recibes <b className="text-accent">{welcome} puntos</b> de regalo.</p>
         <form onSubmit={submit} className="mt-6 space-y-4">
@@ -50,9 +50,6 @@ function Registro() {
           {error && <p className="rounded-lg bg-destructive/15 px-3 py-2 text-sm font-semibold text-destructive">{error}</p>}
           <Button type="submit" variant="hero" size="xl" className="w-full">CREAR MI CUENTA</Button>
           <p className="text-center text-xs text-muted-foreground">Luego podrás completar tu perfil.</p>
-          <button type="button" className="w-full text-xs text-muted-foreground underline" onClick={() => setF({ cedula: String(Math.floor(1e9 + Math.random() * 8e8)).padStart(10, "0"), phone: "0991234567" })}>
-            Rellenar con datos de prueba
-          </button>
         </form>
       </div>
     </div>

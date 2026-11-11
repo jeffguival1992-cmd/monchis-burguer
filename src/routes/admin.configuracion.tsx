@@ -40,9 +40,9 @@ function Configuracion() {
           {branches.map((b) => <p key={b.id} className="text-sm"><b>{b.name}</b> · <span className="text-muted-foreground">{b.address}</span></p>)}
           <ul className="mt-3 space-y-1 text-sm">{employees.map((e) => <li key={e.id}>{e.name} — <span className="text-muted-foreground">{e.role}, {branches.find((b) => b.id === e.branchId)?.name}</span></li>)}</ul>
         </Panel>
-        <Panel title="Datos de la demo">
-          <p className="mb-3 text-sm text-muted-foreground">Todo se guarda en este navegador. Reinicia para volver a los datos originales.</p>
-          <Button variant="destructive" onClick={() => { if (confirm("¿Reiniciar la demo?")) { reset(); toast.success("Demo reiniciada"); } }}>REINICIAR DEMO</Button>
+        <Panel title="Datos del programa">
+          <p className="mb-3 text-sm text-muted-foreground">Restablece clientes, compras y premios a su estado inicial. Esta acción no se puede deshacer.</p>
+          <Button variant="destructive" onClick={() => { if (confirm("¿Seguro? Se borrarán los datos actuales.")) { reset(); toast.success("Datos restablecidos"); } }}>RESTABLECER DATOS</Button>
         </Panel>
       </div>
     </>
