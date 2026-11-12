@@ -86,7 +86,7 @@ export function LoyaltyCard({ customer, compact }: { customer: Customer; compact
             <QRCodeCanvas id={`qr-big-${customer.id}`} value={qrValue(customer)} size={240} marginSize={2} />
           </div>
           <p className="text-center font-mono text-xl font-bold">{customer.code}</p>
-          <Button variant="outline" onClick={download}><Download className="mr-2 h-4 w-4" />Descargar QR (para probar el escáner)</Button>
+          <Button variant="outline" onClick={download}><Download className="mr-2 h-4 w-4" />Descargar mi QR</Button>
         </DialogContent>
       </Dialog>
     </>

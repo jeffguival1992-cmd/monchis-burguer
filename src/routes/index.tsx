@@ -1,11 +1,10 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { QRCodeSVG } from "qrcode.react";
-import { ArrowRight, ScanLine, LayoutDashboard, Smartphone } from "lucide-react";
+import { ArrowRight, ScanLine, Gift, Smartphone } from "lucide-react";
 import burger from "@/assets/burger-hero.jpg";
 import mascot from "@/assets/monchis-dino.png.asset.json";
-import { DemoSwitcher, Logo, SimBadge } from "@/components/monchis/Brand";
+import { Logo } from "@/components/monchis/Brand";
 import { Button } from "@/components/ui/button";
-import { useStore, type Role } from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,20 +20,21 @@ export const Route = createFileRoute("/")({
   component: Portal,
 });
 
-const demos: { role: Role; title: string; desc: string; icon: typeof Smartphone; to: "/cliente" | "/admin/escanear" | "/admin" }[] = [
-  { role: "cliente", title: "DEMO CLIENTE", desc: "Tarjeta digital, puntos, premios y bandeja de mensajes.", icon: Smartphone, to: "/cliente" },
-  { role: "cajero", title: "DEMO CAJERO", desc: "Escanea el QR, registra la compra y entrega puntos en segundos.", icon: ScanLine, to: "/admin/escanear" },
-  { role: "admin", title: "DEMO ADMINISTRADOR", desc: "Dashboard, clientes, recompensas, notificaciones y ajustes.", icon: LayoutDashboard, to: "/admin" },
+const steps = [
+  { title: "REGÍSTRATE", desc: "Solo tu cédula y celular. Recibes puntos de bienvenida al instante.", icon: Smartphone },
+  { title: "MUESTRA TU QR", desc: "En caja escaneamos tu tarjeta digital y sumas 1 punto por cada dólar.", icon: ScanLine },
+  { title: "CANJEA PREMIOS", desc: "Burgers, papas y bebidas gratis. ¡Cada 8 sellos, una burger de regalo!", icon: Gift },
 ];
 
 function Portal() {
-  const setRole = useStore((s) => s.setRole);
-  const navigate = useNavigate();
   return (
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4">
         <Logo />
-        <DemoSwitcher />
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="sm"><Link to="/admin">Personal</Link></Button>
+          <Button asChild variant="hero" size="sm"><Link to="/cliente">Mi tarjeta</Link></Button>
+        </div>
       </header>
 
       <section className="relative mx-auto max-w-6xl px-4">
@@ -53,12 +53,12 @@ function Portal() {
             </div>
             <div className="flex items-end justify-center md:justify-end">
               <div className="animate-pop rounded-3xl border border-border bg-card/90 p-5 text-center backdrop-blur">
-                <p className="font-display text-lg">QR de bienvenida</p>
-                <p className="mb-3 text-xs text-muted-foreground">Así lo verías en la mesa del local</p>
+                <p className="font-display text-lg">Escanea y únete</p>
+                <p className="mb-3 text-xs text-muted-foreground">Disponible en todas nuestras mesas</p>
                 <Link to="/registro" className="block rounded-2xl bg-foreground p-3">
                   <QRCodeSVG value="https://monchis.club/registro" size={150} bgColor="transparent" />
                 </Link>
-                <p className="mt-2 text-xs text-muted-foreground">Toca el QR para simular el escaneo</p>
+                <p className="mt-2 text-xs text-muted-foreground">O toca el código para registrarte</p>
               </div>
             </div>
           </div>
@@ -67,31 +67,25 @@ function Portal() {
 
       <section className="mx-auto max-w-6xl px-4 py-14">
         <div className="flex items-end justify-between gap-4">
-          <h2 className="text-3xl sm:text-4xl">Prueba la plataforma</h2>
+          <h2 className="text-3xl sm:text-4xl">¿Cómo funciona?</h2>
           <img src={mascot.url} alt="" width={1024} height={1024} loading="lazy" className="h-20 w-20 object-contain drop-shadow-lg animate-float" />
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {demos.map((d, i) => (
-            <button key={d.role} onClick={() => { setRole(d.role); navigate({ to: d.to }); }} className="group animate-rise rounded-3xl border border-border bg-card p-6 text-left transition-all hover:-translate-y-1 hover:border-primary hover:shadow-glow" style={{ animationDelay: `${i * 0.08}s` }}>
-              <d.icon className="h-9 w-9 text-primary" />
+          {steps.map((d, i) => (
+            <div key={d.title} className="animate-rise rounded-3xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:border-primary hover:shadow-glow" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-flame font-display text-xl text-primary-foreground">{i + 1}</span><d.icon className="h-8 w-8 text-primary" /></div>
               <p className="font-display mt-4 text-2xl">{d.title}</p>
               <p className="mt-1 text-sm text-muted-foreground">{d.desc}</p>
-              <p className="mt-4 flex items-center gap-1 text-sm font-bold text-accent">Entrar <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></p>
-            </button>
+            </div>
           ))}
         </div>
 
-        <div className="mt-10 grid gap-4 rounded-3xl border border-border bg-card p-6 md:grid-cols-2">
-          <div>
-            <SimBadge real />
-            <p className="mt-2 text-sm text-muted-foreground">Generación de QR, lectura con cámara o imagen, cálculo de puntos, canjes, historial y datos guardados en este navegador.</p>
-          </div>
-          <div>
-            <SimBadge />
-            <p className="mt-2 text-sm text-muted-foreground">Clientes, compras y empleados de ejemplo, y notificaciones que solo aparecen en la bandeja interna (no se envía nada real).</p>
-          </div>
+        <div className="mt-10 flex flex-col items-center gap-4 rounded-3xl bg-loyalty-card p-8 text-center text-primary-foreground shadow-glow">
+          <p className="font-display text-3xl sm:text-4xl">COME, ACUMULA Y DISFRUTA</p>
+          <Button asChild size="xl" className="bg-foreground text-background hover:bg-foreground/90"><Link to="/registro">CREAR MI CUENTA GRATIS</Link></Button>
         </div>
       </section>
+      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} Monchis Burguers · Monchis Loyalty Club</footer>
     </div>
   );
 }
