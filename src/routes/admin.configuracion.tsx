@@ -1,3 +1,4 @@
+import { adminOnly } from "@/lib/guards";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { PageTitle, Panel } from "@/components/monchis/AdminParts";
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/configuracion")({
   head: () => ({ meta: [{ title: "Configuración — Panel Monchis" }, { name: "description", content: "Reglas del programa de fidelización Monchis." }, { property: "og:title", content: "Configuración — Panel Monchis" }, { property: "og:description", content: "Reglas del club." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  beforeLoad: adminOnly,
   component: Configuracion,
 });
 

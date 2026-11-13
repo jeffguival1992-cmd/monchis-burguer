@@ -1,168 +1,163 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import { buildSeed, type Customer, type Movement, type Notification, type Purchase, type Redemption, type Seed } from "./mock-data";
+import { supabase } from "@/integrations/supabase/client";
+import type { Customer, Movement, Notification, Seed } from "./types";
 
 export type Role = "cliente" | "cajero" | "admin";
 export type Celebration = { kind: "points" | "reward" | "welcome" | "stamp"; title: string; message: string } | null;
+type Result<T = object> = ({ ok: true } & T) | { ok: false; error: string };
 
 type State = Seed & {
-  role: Role;
+  role: Role | null;
+  userId: string | null;
   currentCustomerId: string | null;
   selectedCustomerId: string | null;
   celebration: Celebration;
   hydrated: boolean;
-  setRole: (r: Role) => void;
-  setCurrentCustomer: (id: string | null) => void;
+  load: () => Promise<void>;
+  signOut: () => Promise<void>;
   selectCustomer: (id: string | null) => void;
+  celebrate: (c: Celebration) => void;
   clearCelebration: () => void;
-  register: (d: { cedula: string; phone: string }) => { ok: true; customer: Customer } | { ok: false; error: string };
-  updateProfile: (id: string, d: { name: string; email: string; birthdate: string }) => { ok: true } | { ok: false; error: string };
-  registerPurchase: (d: { customerId: string; amount: number; orderNumber: string; branchId: string }) => { ok: true; points: number } | { ok: false; error: string };
-  redeem: (customerId: string, rewardId: string) => { ok: true } | { ok: false; error: string };
-  sendNotification: (d: { customerIds: string[]; type: Notification["type"]; title: string; message: string }) => number;
-  markRead: (customerId: string) => void;
-  setMode: (m: "points" | "stamps") => void;
-  updateSettings: (s: Partial<Seed["settings"]>) => void;
-  toggleReward: (id: string) => void;
-  reset: () => void;
+  updateProfile: (d: { name: string; email: string; birthdate: string }) => Promise<Result>;
+  registerPurchase: (d: { customerId: string; amount: number; orderNumber: string; branchId: string }) => Promise<Result<{ points: number }>>;
+  redeem: (customerId: string, rewardId: string) => Promise<Result<{ code: string }>>;
+  sendNotification: (d: { customerIds: string[]; type: Notification["type"]; title: string; message: string }) => Promise<Result<{ count: number }>>;
+  markRead: () => Promise<void>;
+  updateSettings: (s: Seed["settings"]) => Promise<Result>;
+  saveReward: (r: { id?: string; name: string; description: string; cost: number; emoji: string; active: boolean }) => Promise<Result>;
 };
 
-const uid = (p: string) => `${p}_${Math.random().toString(36).slice(2, 9)}`;
-export const now = () => new Date().toISOString();
+const empty: Seed = {
+  customers: [], employees: [], branches: [], purchases: [], rewards: [], movements: [], redemptions: [], notifications: [],
+  settings: { mode: "points", pointsPerUsd: 1, stampsGoal: 8, welcomePoints: 20 },
+};
+
+const errMsg = (e: { message?: string } | null | undefined) => e?.message?.replace(/^.*?: /, "") || "Ocurrió un error. Intenta de nuevo.";
 
 export function findByQr(customers: Customer[], text: string) {
   const code = text.trim().replace(/^MONCHIS:/i, "").toUpperCase();
   return customers.find((c) => c.code.toUpperCase() === code) ?? null;
 }
 
-export const useStore = create<State>()(
-  persist(
-    (set, get) => ({
-      ...buildSeed(),
-      role: "cliente",
-      currentCustomerId: null,
-      selectedCustomerId: null,
-      celebration: null,
-      hydrated: false,
-      setRole: (role) => set({ role }),
-      setCurrentCustomer: (currentCustomerId) => set({ currentCustomerId }),
-      selectCustomer: (selectedCustomerId) => set({ selectedCustomerId }),
-      clearCelebration: () => set({ celebration: null }),
+export const useStore = create<State>()((set, get) => ({
+  ...empty,
+  role: null,
+  userId: null,
+  currentCustomerId: null,
+  selectedCustomerId: null,
+  celebration: null,
+  hydrated: false,
 
-      register: (d) => {
-        const s = get();
-        const cedula = d.cedula.replace(/\D/g, "");
-        const phone = d.phone.replace(/\s/g, "");
-        if (!/^\d{10}$/.test(cedula)) return { ok: false, error: "La cédula debe tener 10 dígitos." };
-        if (!/^09\d{8}$/.test(phone)) return { ok: false, error: "Ingresa un celular válido (09xxxxxxxx)." };
-        if (s.customers.some((c) => c.cedula === cedula)) return { ok: false, error: "Ya existe un socio con esa cédula." };
-        const n = s.customers.length + 1;
-        const bonus = s.settings.welcomePoints;
-        const customer: Customer = {
-          id: uid("c"), code: `MON-${String(1000 + n)}`, cedula, name: "", email: "", phone,
-          birthdate: "", points: bonus, totalEarned: bonus, totalUsed: 0, stamps: 0, visits: 0,
-          joinedAt: now(), branchId: s.branches[0]?.id ?? "b1",
-        };
-        const mv: Movement = { id: uid("m"), customerId: customer.id, type: "bonus", points: bonus, description: "Bono de bienvenida", date: now() };
-        const nt: Notification = { id: uid("n"), customerId: customer.id, type: "reward", title: "¡Bienvenido al club!", message: `¡Hola! Te regalamos ${bonus} puntos de bienvenida.`, date: now(), read: false };
-        set({
-          customers: [customer, ...s.customers], movements: [mv, ...s.movements], notifications: [nt, ...s.notifications],
-          currentCustomerId: customer.id,
-          celebration: { kind: "welcome", title: "¡BIENVENIDO A MONCHIS!", message: `Tu tarjeta está lista. Ganaste ${bonus} puntos de bienvenida.` },
-        });
-        return { ok: true, customer };
-      },
+  load: async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const [settings, rewards, branches] = await Promise.all([
+      supabase.from("settings").select("*").eq("id", 1).maybeSingle(),
+      supabase.from("rewards").select("*").order("cost"),
+      supabase.from("branches").select("*").order("id"),
+    ]);
+    const base = {
+      settings: settings.data ? { mode: settings.data.mode as "points" | "stamps", pointsPerUsd: settings.data.points_per_usd, stampsGoal: settings.data.stamps_goal, welcomePoints: settings.data.welcome_points } : empty.settings,
+      rewards: (rewards.data ?? []).map((r) => ({ id: r.id, name: r.name, description: r.description, cost: r.cost, emoji: r.emoji, active: r.active })),
+      branches: branches.data ?? [],
+    };
+    if (!user) { set({ ...empty, ...base, role: null, userId: null, currentCustomerId: null, hydrated: true }); return; }
 
-      updateProfile: (id, d) => {
-        const email = d.email.trim().toLowerCase();
-        if (!d.name.trim()) return { ok: false, error: "Ingresa tu nombre." };
-        if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Correo electrónico no válido." };
-        if (email && get().customers.some((c) => c.id !== id && c.email === email)) return { ok: false, error: "Ese correo ya está registrado." };
-        set((s) => ({ customers: s.customers.map((c) => (c.id === id ? { ...c, name: d.name.trim(), email, birthdate: d.birthdate } : c)) }));
-        return { ok: true };
-      },
+    // Row-level security returns only what this user may see (own card for clients, everything for staff).
+    const [roles, customers, purchases, movements, redemptions, notifications, staff] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", user.id),
+      supabase.from("customers").select("*").order("joined_at", { ascending: false }),
+      supabase.from("purchases").select("*").order("created_at", { ascending: false }),
+      supabase.from("movements").select("*").order("created_at", { ascending: false }),
+      supabase.from("redemptions").select("*").order("created_at", { ascending: false }),
+      supabase.from("notifications").select("*").order("created_at", { ascending: false }),
+      supabase.from("staff").select("*"),
+    ]);
+    const roleList = (roles.data ?? []).map((r) => r.role);
+    const role: Role = roleList.includes("admin") ? "admin" : roleList.includes("cajero") ? "cajero" : "cliente";
+    const cs: Customer[] = (customers.data ?? []).map((c) => ({
+      id: c.id, code: c.code, cedula: c.cedula, name: c.name, email: c.email, phone: c.phone, birthdate: c.birthdate,
+      points: c.points, totalEarned: c.total_earned, totalUsed: c.total_used, stamps: c.stamps, visits: c.visits, joinedAt: c.joined_at, branchId: c.branch_id ?? "b1",
+    }));
+    set({
+      ...base,
+      role, userId: user.id, hydrated: true,
+      currentCustomerId: (customers.data ?? []).find((c) => c.user_id === user.id)?.id ?? null,
+      customers: cs,
+      purchases: (purchases.data ?? []).map((p) => ({ id: p.id, customerId: p.customer_id, amount: Number(p.amount), orderNumber: p.order_number, branchId: p.branch_id ?? "b1", points: p.points, date: p.created_at, employeeId: p.employee_id ?? "" })),
+      movements: (movements.data ?? []).map((m) => ({ id: m.id, customerId: m.customer_id, type: m.type as Movement["type"], points: m.points, description: m.description, date: m.created_at })),
+      redemptions: (redemptions.data ?? []).map((r) => ({ id: r.id, customerId: r.customer_id, rewardId: r.reward_id, cost: r.cost, date: r.created_at, code: r.code })),
+      notifications: (notifications.data ?? []).map((n) => ({ id: n.id, customerId: n.customer_id, type: n.type as Notification["type"], title: n.title, message: n.message, date: n.created_at, read: n.read })),
+      employees: (staff.data ?? []).map((s) => ({ id: s.user_id, name: s.name, role: "Personal" as const, branchId: s.branch_id ?? "b1" })),
+    });
+  },
 
-      registerPurchase: ({ customerId, amount, orderNumber, branchId }) => {
-        const s = get();
-        const c = s.customers.find((x) => x.id === customerId);
-        if (!c) return { ok: false, error: "Cliente no encontrado." };
-        if (!Number.isFinite(amount) || amount <= 0) return { ok: false, error: "Ingresa un valor de compra mayor a 0." };
-        if (amount > 1000) return { ok: false, error: "El valor máximo por compra es USD 1000." };
-        if (!orderNumber.trim()) return { ok: false, error: "Ingresa el número de pedido." };
-        if (s.purchases.some((p) => p.orderNumber.toLowerCase() === orderNumber.trim().toLowerCase())) return { ok: false, error: "Ese número de pedido ya fue registrado." };
-        const stampsMode = s.settings.mode === "stamps";
-        const pts = stampsMode ? 0 : Math.floor(amount * s.settings.pointsPerUsd);
-        const p: Purchase = { id: uid("p"), customerId, amount, orderNumber: orderNumber.trim(), branchId, points: pts, date: now(), employeeId: s.employees[s.role === "admin" ? 0 : 1]?.id ?? "e1" };
-        let stamps = c.stamps;
-        const movements: Movement[] = [];
-        const notifications: Notification[] = [];
-        let celebration: Celebration;
-        if (stampsMode) {
-          stamps += 1;
-          movements.push({ id: uid("m"), customerId, type: "stamp", points: 0, description: `Sello por pedido ${p.orderNumber}`, date: now() });
-          if (stamps >= s.settings.stampsGoal) {
-            celebration = { kind: "reward", title: "¡LO LOGRASTE!", message: "TU PREMIO MONCHIS TE ESPERA: hamburguesa gratis." };
-            notifications.push({ id: uid("n"), customerId, type: "reward", title: "¡Tarjeta de sellos completa!", message: "Reclama tu hamburguesa gratis en caja.", date: now(), read: false });
-          } else celebration = { kind: "stamp", title: "¡GENIAL!", message: `Ganaste 1 sello. Llevas ${stamps} de ${s.settings.stampsGoal}.` };
-        } else {
-          movements.push({ id: uid("m"), customerId, type: "earn", points: pts, description: `Compra ${p.orderNumber} · USD ${amount.toFixed(2)}`, date: now() });
-          celebration = { kind: "points", title: "¡GENIAL!", message: `ACABAS DE GANAR ${pts} PUNTOS` };
-        }
-        set({
-          purchases: [p, ...s.purchases],
-          movements: [...movements, ...s.movements],
-          notifications: [...notifications, ...s.notifications],
-          customers: s.customers.map((x) => x.id === customerId ? { ...x, points: x.points + pts, totalEarned: x.totalEarned + pts, stamps, visits: x.visits + 1 } : x),
-          celebration,
-        });
-        return { ok: true, points: pts };
-      },
+  signOut: async () => {
+    await supabase.auth.signOut();
+    set({ ...empty, role: null, userId: null, currentCustomerId: null, selectedCustomerId: null, hydrated: false });
+  },
+  selectCustomer: (selectedCustomerId) => set({ selectedCustomerId }),
+  celebrate: (celebration) => set({ celebration }),
+  clearCelebration: () => set({ celebration: null }),
 
-      redeem: (customerId, rewardId) => {
-        const s = get();
-        const c = s.customers.find((x) => x.id === customerId);
-        const r = s.rewards.find((x) => x.id === rewardId);
-        if (!c || !r) return { ok: false, error: "Datos no válidos." };
-        if (!r.active) return { ok: false, error: "Esta recompensa no está disponible." };
-        const stampReward = s.settings.mode === "stamps" && r.id === "r1";
-        if (stampReward) {
-          if (c.stamps < s.settings.stampsGoal) return { ok: false, error: `Necesitas ${s.settings.stampsGoal} sellos.` };
-        } else if (c.points < r.cost) return { ok: false, error: `Te faltan ${r.cost - c.points} puntos.` };
-        const cost = stampReward ? 0 : r.cost;
-        const red: Redemption = { id: uid("x"), customerId, rewardId, cost, date: now(), code: `PREMIO-${Math.random().toString(36).slice(2, 7).toUpperCase()}` };
-        set({
-          redemptions: [red, ...s.redemptions],
-          movements: [{ id: uid("m"), customerId, type: "redeem", points: -cost, description: `Canje: ${r.name}${stampReward ? " (sellos)" : ""}`, date: now() }, ...s.movements],
-          customers: s.customers.map((x) => x.id === customerId ? { ...x, points: x.points - cost, totalUsed: x.totalUsed + cost, stamps: stampReward ? 0 : x.stamps } : x),
-          celebration: { kind: "reward", title: "¡LO LOGRASTE!", message: `TU PREMIO MONCHIS TE ESPERA · ${r.name} · Código ${red.code}` },
-        });
-        return { ok: true };
-      },
+  updateProfile: async (d) => {
+    const { error } = await supabase.rpc("update_my_profile", { _name: d.name, _email: d.email, _birthdate: d.birthdate });
+    if (error) return { ok: false, error: errMsg(error) };
+    await get().load();
+    return { ok: true };
+  },
 
-      sendNotification: ({ customerIds, type, title, message }) => {
-        const s = get();
-        const list = customerIds.map((id) => {
-          const c = s.customers.find((x) => x.id === id)!;
-          return { id: uid("n"), customerId: id, type, title, message: message.replace(/\{nombre\}/gi, c.name.split(" ")[0] || "socio"), date: now(), read: false } as Notification;
-        });
-        set({ notifications: [...list, ...s.notifications] });
-        return list.length;
-      },
-      markRead: (customerId) => set((s) => ({ notifications: s.notifications.map((n) => (n.customerId === customerId ? { ...n, read: true } : n)) })),
-      setMode: (mode) => set((s) => ({ settings: { ...s.settings, mode } })),
-      updateSettings: (p) => set((s) => ({ settings: { ...s.settings, ...p } })),
-      toggleReward: (id) => set((s) => ({ rewards: s.rewards.map((r) => (r.id === id ? { ...r, active: !r.active } : r)) })),
-      reset: () => set({ ...buildSeed(), currentCustomerId: null, selectedCustomerId: null, celebration: null }),
-    }),
-    {
-      name: "monchis-loyalty-v2",
-      storage: createJSONStorage(() => localStorage),
-      skipHydration: true,
-      partialize: ({ celebration, hydrated, ...rest }) => rest,
-      onRehydrateStorage: () => () => useStore.setState({ hydrated: true }),
-    },
-  ),
-);
+  registerPurchase: async ({ customerId, amount, orderNumber, branchId }) => {
+    if (!Number.isFinite(amount) || amount <= 0) return { ok: false, error: "Ingresa un valor de compra mayor a 0." };
+    const { data, error } = await supabase.rpc("register_purchase", { _customer_id: customerId, _amount: amount, _order: orderNumber, _branch: branchId });
+    if (error) return { ok: false, error: errMsg(error) };
+    const r = data as { points: number; stamps: number; goal: number; mode: string };
+    await get().load();
+    set({
+      celebration: r.mode === "stamps"
+        ? r.stamps >= r.goal ? { kind: "reward", title: "¡LO LOGRASTE!", message: "TU PREMIO MONCHIS TE ESPERA: hamburguesa gratis." } : { kind: "stamp", title: "¡GENIAL!", message: `Ganaste 1 sello. Llevas ${r.stamps} de ${r.goal}.` }
+        : { kind: "points", title: "¡GENIAL!", message: `ACABAS DE GANAR ${r.points} PUNTOS` },
+    });
+    return { ok: true, points: r.points };
+  },
+
+  redeem: async (customerId, rewardId) => {
+    const { data, error } = await supabase.rpc("redeem_reward", { _customer_id: customerId, _reward_id: rewardId });
+    if (error) return { ok: false, error: errMsg(error) };
+    const r = data as { code: string; name: string };
+    await get().load();
+    set({ celebration: { kind: "reward", title: "¡LO LOGRASTE!", message: `TU PREMIO MONCHIS TE ESPERA · ${r.name} · Código ${r.code}` } });
+    return { ok: true, code: r.code };
+  },
+
+  sendNotification: async ({ customerIds, type, title, message }) => {
+    const { data, error } = await supabase.rpc("send_notifications", { _customer_ids: customerIds, _type: type, _title: title, _message: message });
+    if (error) return { ok: false, error: errMsg(error) };
+    await get().load();
+    return { ok: true, count: data as number };
+  },
+
+  markRead: async () => {
+    await supabase.rpc("mark_my_notifications_read");
+    await get().load();
+  },
+
+  updateSettings: async (s) => {
+    const { error } = await supabase.from("settings").update({ mode: s.mode, points_per_usd: s.pointsPerUsd, stamps_goal: s.stampsGoal, welcome_points: s.welcomePoints }).eq("id", 1);
+    if (error) return { ok: false, error: errMsg(error) };
+    await get().load();
+    return { ok: true };
+  },
+
+  saveReward: async (r) => {
+    if (!r.name.trim()) return { ok: false, error: "Ingresa el nombre del premio." };
+    if (!Number.isInteger(r.cost) || r.cost <= 0) return { ok: false, error: "El costo debe ser mayor a 0." };
+    const row = { name: r.name.trim(), description: r.description.trim(), cost: r.cost, emoji: r.emoji || "🎁", active: r.active };
+    const { error } = r.id ? await supabase.from("rewards").update(row).eq("id", r.id) : await supabase.from("rewards").insert(row);
+    if (error) return { ok: false, error: errMsg(error) };
+    await get().load();
+    return { ok: true };
+  },
+}));
 
 export function tierOf(totalEarned: number) {
   if (totalEarned >= 900) return { name: "Dino Legend", next: null as number | null };

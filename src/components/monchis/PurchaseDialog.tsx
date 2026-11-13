@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Customer } from "@/lib/mock-data";
+import type { Customer } from "@/lib/types";
 import { useStore } from "@/lib/store";
 
 export function PurchaseDialog({ customer, open, onOpenChange }: { customer: Customer | null; open: boolean; onOpenChange: (o: boolean) => void }) {

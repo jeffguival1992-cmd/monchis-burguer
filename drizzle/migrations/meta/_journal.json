@@ -8,6 +8,13 @@
       "when": 1794455756701,
       "tag": "0000_loyalty_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794530342619,
+      "tag": "0001_staff_roles_and_cedula_email",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,4 @@
+import { adminOnly } from "@/lib/guards";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageTitle, Panel } from "@/components/monchis/AdminParts";
 import { Switch } from "@/components/ui/switch";
@@ -6,6 +7,7 @@ import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/admin/recompensas")({
   head: () => ({ meta: [{ title: "Recompensas — Panel Monchis" }, { name: "description", content: "Catálogo de premios y canjes del club Monchis." }, { property: "og:title", content: "Recompensas — Panel Monchis" }, { property: "og:description", content: "Catálogo de premios." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  beforeLoad: adminOnly,
   component: Recompensas,
 });
 

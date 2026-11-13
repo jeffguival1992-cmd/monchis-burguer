@@ -7,7 +7,7 @@ import { LoyaltyCard } from "@/components/monchis/LoyaltyCard";
 import { PurchaseDialog } from "@/components/monchis/PurchaseDialog";
 import { initials, matchCustomer } from "@/lib/format";
 import { tierOf, useStore } from "@/lib/store";
-import type { Customer } from "@/lib/mock-data";
+import type { Customer } from "@/lib/types";
 
 export function PageTitle({ title, sub, children }: { title: string; sub?: string; children?: React.ReactNode }) {
   return (

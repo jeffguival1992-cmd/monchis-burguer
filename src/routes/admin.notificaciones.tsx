@@ -1,5 +1,6 @@
 import { displayName } from "@/lib/format";
 import { useState } from "react";
+import { adminOnly } from "@/lib/guards";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { PageTitle, Panel } from "@/components/monchis/AdminParts";
@@ -8,12 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { fmtDate } from "@/lib/format";
-import type { Notification } from "@/lib/mock-data";
+import type { Notification } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/notificaciones")({
   head: () => ({ meta: [{ title: "Notificaciones — Panel Monchis" }, { name: "description", content: "Envía mensajes simulados a los socios Monchis." }, { property: "og:title", content: "Notificaciones — Panel Monchis" }, { property: "og:description", content: "Mensajes para socios." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  beforeLoad: adminOnly,
   component: Notificaciones,
 });
 

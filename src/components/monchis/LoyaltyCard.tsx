@@ -6,7 +6,7 @@ import mascot from "@/assets/monchis-dino.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
-import type { Customer } from "@/lib/mock-data";
+import type { Customer } from "@/lib/types";
 import { tierOf, useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 

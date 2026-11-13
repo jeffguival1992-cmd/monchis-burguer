@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { Bell, Gift, LayoutDashboard, ListOrdered, Menu, ReceiptText, ScanLine, Settings, Users, X } from "lucide-react";
+import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { requireStaff } from "@/lib/guards";
+import { Bell, Gift, LayoutDashboard, ListOrdered, LogOut, Menu, ReceiptText, ScanLine, Settings, Users, X } from "lucide-react";
 import mascot from "@/assets/monchis-dino.png.asset.json";
 import { Logo } from "@/components/monchis/Brand";
 import { useStore } from "@/lib/store";
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/admin")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  ssr: false,
+  beforeLoad: () => requireStaff(),
   component: AdminLayout,
 });
 
@@ -32,12 +35,14 @@ const nav = [
 ] as const;
 
 function AdminLayout() {
-  const role = useStore((s) => s.role);
-  const hydrated = useStore((s) => s.hydrated);
-  const employees = useStore((s) => s.employees);
+  const { staffRole: role } = Route.useRouteContext();
+  const hydrated = useStore((s) => s.hydrated && s.role !== null && s.role !== "cliente");
+  const me = useStore((s) => s.employees.find((e) => e.id === s.userId));
+  const signOut = useStore((s) => s.signOut);
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const items = nav.filter((n) => role === "admin" || !("admin" in n));
-  const me = role === "admin" ? employees[0]! : employees[1]!;
+  const logout = async () => { await signOut(); navigate({ to: "/personal", replace: true }); };
 
   const sidebar = (
     <aside className="flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar p-4">
@@ -52,7 +57,8 @@ function AdminLayout() {
       </nav>
       <div className="flex items-center gap-3 rounded-2xl bg-sidebar-accent p-3">
         <img src={mascot.url} alt="" className="h-9 w-9 object-contain drop-shadow-lg" />
-        <div className="text-xs"><p className="font-bold">{me.name}</p><p className="text-muted-foreground">{me.role}</p></div>
+        <div className="min-w-0 flex-1 text-xs"><p className="truncate font-bold">{me?.name ?? "Personal"}</p><p className="text-muted-foreground">{role === "admin" ? "Administrador" : "Cajero"}</p></div>
+        <button onClick={logout} aria-label="Cerrar sesión" className="text-muted-foreground hover:text-primary"><LogOut className="h-4 w-4" /></button>
       </div>
     </aside>
   );
